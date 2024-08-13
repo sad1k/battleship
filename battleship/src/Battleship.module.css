@@ -1,0 +1,39 @@
+.battleship{
+  margin-top: 20px;
+}
+
+.app{
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
+
+.enemyField:hover{
+  border-color: greenyellow;
+}
+
+.battleshipRow{
+  display: flex;
+  flex-direction: row;
+}
+
+.battleField{
+  background-color: white;
+  border: 2px solid gray;
+  height: 50px;
+  width: 50px;
+}
+
+.battleFieldMarked{
+  background-color: gray;
+  border: 2px solid gray;
+  height: 50px;
+  width: 50px;
+}
+
+
+.timer{
+  margin-top: 20px;
+  font-size: 25px;
+  font-weight: bold;
+}
