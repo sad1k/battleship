@@ -8,8 +8,31 @@
   align-items: center
 }
 
+.disabled{
+  opacity: 0.5;
+}
+
+
+div .hitField{
+  background-image: url(./assets/redx.png);
+  border: 2px solid gray;
+  background-size: contain;
+  height: 50px;
+  width: 50px;
+}
+
+div .missField{
+  background-color: aqua;
+}
 .enemyField:hover{
   border-color: greenyellow;
+}
+
+.enemyField{
+  background-color: white;
+  border: 2px solid gray;
+  height: 50px;
+  width: 50px;
 }
 
 .battleshipRow{
