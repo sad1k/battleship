@@ -61,8 +61,8 @@ export function Game({
         stopGame()
       }else{
         simulateClick(false);
-        setCountToLose(c => c - 1)
       }
+      setCountToLose(c => c - 1)
     }
   };
 
@@ -84,9 +84,9 @@ export function Game({
         setOpen(true)
         stopGame()
       }else{
-        setCountToWin(c => c - 1)
         setDisabled(false);
       }
+      setCountToWin(c => c - 1)
     } else {
       setDisabled(true);
       simulateClick(false);
@@ -110,15 +110,15 @@ export function Game({
           setField={setField(false)}
         />
       <Modal open={open} onClose={() => {
-        const isUserWin = (countToWin === 1)
+        const isUserWin = (countToWin === 0)
         setField(!isUserWin)(() => createField())
         setCountToLose(3)
         setCountToWin(3)
         setOpen(false)
       }}>
-        {countToWin == 1
+        {countToWin == 0
           ? "Ура вы победили!"
-          : countToLose == 1
+          : countToLose == 0
           ? "Увы вы проиграли"
           : ""}
       </Modal>
