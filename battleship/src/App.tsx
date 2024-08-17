@@ -18,6 +18,8 @@ function App() {
   const [isStarted, setIsStarted] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [paused, setPaused] = useState(false);
+  const [countToWin, setCountToWin] = useState(3)
+  const [countToLose, setCountToLose] = useState(3)
   const [bot, setBot] = useState({
     botTimerRef: -1,
     endTimeForShoot: -1,
@@ -32,7 +34,17 @@ function App() {
     }
   };
 
+  const initFields = () => {
+    setMyField(() => createField());
+    setEnemyField(() => createField());
+  };
+
   const startGame = () => {
+    if (isStarted) {
+      initFields();
+      clearIntervals();
+      startTimer();
+    }
     setDisabled(false);
     setIsStarted(true);
   };
@@ -44,7 +56,6 @@ function App() {
       return enemyField;
     }
   };
-  console.log("render");
   useEffect(() => {
     if (isStarted) {
       reset();
@@ -56,7 +67,6 @@ function App() {
 
   const startTimer = (initialTime = TIMEFORSTEP, callback?: () => void) => {
     const startTime = Date.now();
-    console.log(initialTime);
     timerRef.current = setInterval(() => {
       const timePassed = Date.now() - startTime;
       if (timePassed > initialTime) {
@@ -88,12 +98,10 @@ function App() {
   const handleResetField = () => {
     setIsStarted(false);
     setPaused(false);
-    console.log('aboba')
-    setMyField(() => createField());
-    setEnemyField(() => createField());
-    if (isStarted) {
-      startGame()
-    }
+    clearIntervals();
+    initFields()
+    setCountToLose(3)
+    setCountToWin(3)
   };
 
   const handleTimeExpired = () => {
@@ -116,7 +124,7 @@ function App() {
           restTime: Date.now() - bot.endTimeForShoot,
         }));
       }
-      clearIntervals()
+      clearIntervals();
     }
   };
   const continueGame = () => {
@@ -124,7 +132,6 @@ function App() {
     if (disabled) {
       simulateClick(false, bot.restTime);
     } else {
-      console.log(timeLeft);
       startTimer(timeLeft, () => {
         handleTimeExpired();
       });
@@ -132,20 +139,23 @@ function App() {
   };
 
   const clearIntervals = () => {
-    clearInterval(timerRef.current)
-    clearInterval(bot.botTimerRef)
-  }
+    clearInterval(timerRef.current);
+    clearInterval(bot.botTimerRef);
+  };
 
   const stopGame = () => {
-    clearIntervals()
-    setIsStarted(false)
+    setIsStarted(false);
+    setPaused(false);
     setDisabled(true)
-  }
-  
+    clearIntervals();
+    initFields()
+  };
+
   return (
     <div className={styles.root}>
       <div className={styles.app}>
         <ButtonsBar
+          isStarted={isStarted}
           startGame={startGame}
           pauseGame={pauseGame}
           continueGame={continueGame}
@@ -162,6 +172,10 @@ function App() {
               setField={setField}
               getField={getField}
               disabled={disabled}
+              setCountToWin={setCountToWin}
+              setCountToLose={setCountToLose}
+              countToLose={countToLose}
+              countToWin={countToWin}
               reset={reset}
               setDisabled={setDisabled}
               stopGame={stopGame}

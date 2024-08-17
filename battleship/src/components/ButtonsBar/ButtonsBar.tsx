@@ -1,5 +1,4 @@
 import { Button } from "../Button/Button";
-import { useState } from "react";
 
 interface ButtonProps {
   startGame: () => void;
@@ -8,6 +7,7 @@ interface ButtonProps {
   continueGame: () => void;
   paused: boolean;
   setPaused: React.Dispatch<React.SetStateAction<boolean>>;
+  isStarted: boolean
 }
 
 export const ButtonsBar = ({
@@ -16,19 +16,15 @@ export const ButtonsBar = ({
   continueGame,
   paused,
   setPaused,
+  isStarted,
   pauseGame,
 }: ButtonProps) => {
-  const [disabledFirst, setDisabledFirst] = useState(false);
-  const [disabledThird, setDisabledThird] = useState(true);
 
   return (
     <div className="buttonsPanel">
       <Button
-        disabled={disabledFirst}
         onClick={() => {
           startGame();
-          setDisabledThird(false);
-          setDisabledFirst(true);
         }}
       >
         Начать игру
@@ -45,7 +41,7 @@ export const ButtonsBar = ({
         </Button>
       ) : (
         <Button
-          disabled={disabledThird}
+          disabled={!isStarted}
           onClick={() => {
             pauseGame();
             setPaused(true);

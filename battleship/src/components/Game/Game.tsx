@@ -1,11 +1,10 @@
 import { CellStatus } from "../Cell";
-import { getRandomIds } from "../../utils/createField";
+import { createField, getRandomIds } from "../../utils/createField";
 import styles from "../../Battleship.module.css";
 import { Field } from "../Field/Field";
 import { makeEvent } from "../../utils/makeEvent";
 import { changeBoardAfterShoot } from "../../utils/changeBoardAfterShoot";
-import { DissableWrapper } from "../DisableWrapper/DissableWrapper";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal } from "../Modal/Modal";
 
 export const ISBOT = "isbot";
@@ -17,6 +16,10 @@ interface GameProps {
   ) => React.Dispatch<React.SetStateAction<CellStatus[][]>>;
   disabled: boolean;
   isStarted: boolean;
+  countToWin: number;
+  countToLose: number;
+  setCountToWin:React.Dispatch<React.SetStateAction<number>>;
+  setCountToLose: React.Dispatch<React.SetStateAction<number>>;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   reset: () => void;
   stopGame: () => void
@@ -26,16 +29,18 @@ export function Game({
   getField,
   setField,
   disabled,
-  isStarted,
   setDisabled,
   reset,
+  countToWin,
+  countToLose,
+  setCountToWin,
+  setCountToLose,
   stopGame
 }: GameProps) {
   const myField = getField(true);
   const enemyField = getField(false);
-  const [countToWin, setCountToWin] = useState(3);
-  const [countToLose, setCountToLose] = useState(3);
   const [open, setOpen] = useState(false);
+
 
   const shoot = (x: number, y: number, isEnemyField: boolean) => {
     if (!disabled && isEnemyField) {
@@ -51,10 +56,16 @@ export function Game({
     if (!isHit) {
       setDisabled(false);
     } else {
-      setCountToLose(c => c - 1)
-      simulateClick(false);
+      if(countToLose === 1){
+        setOpen(true)
+        stopGame()
+      }else{
+        simulateClick(false);
+        setCountToLose(c => c - 1)
+      }
     }
   };
+
 
   const simulateClick = (user: boolean) => {
     const [x, y] = getRandomIds(user ? enemyField : myField)
@@ -69,23 +80,21 @@ export function Game({
     const isHit = enemyField[y][x] === CellStatus.Ship;
     changeBoardAfterShoot(enemyField, x, y, isHit);
     if (isHit) {
-      setCountToWin(c => c - 1)
-      setDisabled(false);
+      if(countToWin === 1){
+        setOpen(true)
+        stopGame()
+      }else{
+        setCountToWin(c => c - 1)
+        setDisabled(false);
+      }
     } else {
       setDisabled(true);
       simulateClick(false);
     }
   };
 
-  useEffect(() => {
-    if(countToLose === 0 || countToWin === 0){
-      setOpen(true)
-      stopGame()
-    }
-  }, [countToLose, countToWin])
-
   return (
-    <div className={styles.app}>
+    <div className={styles.game}>
       <Field
         field={myField}
         isMyStep={false}
@@ -93,10 +102,6 @@ export function Game({
         isEnemyField={false}
         setField={setField(true)}
       />
-      <DissableWrapper
-        style={{ padding: "0px", marginTop: "20px" }}
-        disabled={disabled || isStarted}
-      >
         <Field
           field={enemyField}
           isMyStep={!disabled}
@@ -104,16 +109,18 @@ export function Game({
           isEnemyField
           setField={setField(false)}
         />
-      </DissableWrapper>
-      <button onClick={() => setOpen(true)}>
-        test
-      </button>
-      <Modal open={open} setOpen={setOpen}>
-        {countToWin === 0
+      <Modal open={open} onClose={() => {
+        const isUserWin = (countToWin === 1)
+        setField(!isUserWin)(() => createField())
+        setCountToLose(3)
+        setCountToWin(3)
+        setOpen(false)
+      }}>
+        {countToWin == 1
           ? "Ура вы победили!"
-          : countToLose === 0
+          : countToLose == 1
           ? "Увы вы проиграли"
-          : "test"}
+          : ""}
       </Modal>
     </div>
   );

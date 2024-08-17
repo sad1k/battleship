@@ -2,8 +2,8 @@ import styles from "../../Battleship.module.css";
 
 export const DissableWrapper = ({ ...props }) => {
   const style = {
-    pointerEvents: props.disabled ? "none" : "auto", // Отключает все клики, если disable=true
-    opacity: props.disabled ? 0.5 : 1, // Дополнительно визуально затемняет контент, когда он отключен (по желанию)
+    pointerEvents: props.disabled ? "none" : "auto",
+    opacity: props.disabled ? 0.5 : 1,
   };
   
   return (

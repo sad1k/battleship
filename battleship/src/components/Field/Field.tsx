@@ -28,7 +28,6 @@ export const Field = ({
       setField(structuredClone(field));
     }
   };
-
   return (
     <div
       onClick={handleClick}
@@ -38,7 +37,6 @@ export const Field = ({
         return (
           <div className={styles.battleshipRow}>
             {row.map((field, index2) => {
-              //Заюзать библиотеку classnames
               return (
                 <Cell
                   x={index2}
