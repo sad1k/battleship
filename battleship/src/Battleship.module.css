@@ -1,5 +1,9 @@
 .battleship{
-  margin-top: 20px;
+  opacity: 1;
+}
+
+.root{
+  margin: 0 auto;
 }
 
 .app{
@@ -10,29 +14,30 @@
 
 .disabled{
   opacity: 0.5;
+
 }
 
-
-div .hitField{
-  background-image: url(./assets/redx.png);
+.field{
   border: 2px solid gray;
-  background-size: contain;
   height: 50px;
   width: 50px;
 }
 
-div .missField{
+.hittedField{
+  background-image: url(./assets/redx.png);
+  background-size: contain;
+}
+
+.missField{
   background-color: aqua;
 }
+
 .enemyField:hover{
   border-color: greenyellow;
 }
 
 .enemyField{
   background-color: white;
-  border: 2px solid gray;
-  height: 50px;
-  width: 50px;
 }
 
 .battleshipRow{
@@ -40,18 +45,12 @@ div .missField{
   flex-direction: row;
 }
 
-.battleField{
+.emptyField{
   background-color: white;
-  border: 2px solid gray;
-  height: 50px;
-  width: 50px;
 }
 
-.battleFieldMarked{
+.shipField{
   background-color: gray;
-  border: 2px solid gray;
-  height: 50px;
-  width: 50px;
 }
 
 
@@ -59,4 +58,24 @@ div .missField{
   margin-top: 20px;
   font-size: 25px;
   font-weight: bold;
+}
+
+.btn {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  margin: 0px 5px;
+}
+.btn:hover {
+  border-color: #646cff;
+}
+.btn:focus,
+.btn:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }

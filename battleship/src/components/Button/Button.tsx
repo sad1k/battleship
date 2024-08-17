@@ -1,10 +1,7 @@
+import styles from "../../Battleship.module.css";
 
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  
-}
+export const Button = ({children, ...props}: React.ButtonHTMLAttributes<HTMLButtonElement>): JSX.Element => {
 
-export const Button = ({children, ...props}: ButtonProps): JSX.Element => {
-
-  return <button {...props}>{children}</button>
+  return <button className={styles.btn} {...props}>{children}</button>
 }
