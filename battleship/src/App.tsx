@@ -99,15 +99,20 @@ function App() {
     },
     [bot.botTimerRef, enemyField, myField]
   );
+  
+  const clearIntervals = useCallback(() => {
+    clearInterval(timerRef.current);
+    clearInterval(bot.botTimerRef.current);
+  }, [bot.botTimerRef]);
 
-  const handleResetField = () => {
+  const handleResetField = useCallback(() => {
     setIsStarted(false);
     setPaused(false);
     clearIntervals();
     initFields();
     setCountToLose(3);
     setCountToWin(3);
-  };
+  }, [clearIntervals])
 
   const reset = useCallback(() => {
     clearInterval(timerRef.current);
@@ -142,10 +147,6 @@ function App() {
     }
   };
 
-  const clearIntervals = useCallback(() => {
-    clearInterval(timerRef.current);
-    clearInterval(bot.botTimerRef.current);
-  }, [bot.botTimerRef]);
 
   const stopGame = useCallback(() => {
     setIsStarted(false);
@@ -170,7 +171,7 @@ function App() {
         <Timer timeLeft={timeLeft} />
         <Title isStarted={isStarted} disabled={disabled} />
         <div>
-          <DissableWrapper disabled={paused}>
+          <DissableWrapper disabled={!isStarted || paused}>
             <Game
               isStarted={paused}
               setField={setField}
