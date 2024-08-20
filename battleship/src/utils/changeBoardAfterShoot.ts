@@ -6,7 +6,6 @@ export const changeBoardAfterShoot = (
   y: number,
   isHit: boolean
 ) => {
-  console.log(x, y);
   if (isHit) {
     field[y][x] = CellStatus.Hitted;
   } else {
