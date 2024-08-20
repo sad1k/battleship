@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Game } from "./components/Game/Game";
 import { TIMEFORSTEP, Timer } from "./components/Timer/Timer";
 import { createField, getRandomIds } from "./utils/createField";
@@ -18,21 +18,21 @@ function App() {
   const [isStarted, setIsStarted] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [paused, setPaused] = useState(false);
-  const [countToWin, setCountToWin] = useState(3)
-  const [countToLose, setCountToLose] = useState(3)
+  const [countToWin, setCountToWin] = useState(3);
+  const [countToLose, setCountToLose] = useState(3);
   const [bot, setBot] = useState({
-    botTimerRef: -1,
+    botTimerRef: useRef(-1),
     endTimeForShoot: -1,
     restTime: -1,
   });
 
-  const setField = (user: boolean) => {
+  const setField = useCallback((user: boolean) => {
     if (user) {
       return setMyField;
     } else {
       return setEnemyField;
     }
-  };
+  }, [])
 
   const initFields = () => {
     setMyField(() => createField());
@@ -49,13 +49,14 @@ function App() {
     setIsStarted(true);
   };
 
-  const getField = (user: boolean) => {
+  const getField = useCallback((user: boolean) => {
     if (user) {
       return myField;
     } else {
       return enemyField;
     }
-  };
+  }, [enemyField, myField])
+
   useEffect(() => {
     if (isStarted) {
       reset();
@@ -79,41 +80,42 @@ function App() {
     }, 16);
   };
 
-  const simulateClick = (user: boolean, time: number = 1000) => {
-    const [x, y] = getRandomIds(user ? enemyField : myField)
-      .split("-")
-      .map(Number);
-    const cell = document.querySelectorAll(`div[id='${x}-${y}']`)[user ? 1 : 0];
-    const ref = makeEvent(cell, user, time);
-    if (ref) {
-      setBot((bot) => ({
-        ...bot,
-        botTimerRef: ref,
-        endTimeForShoot: Date.now() + 1000,
-      }));
-    }
-    reset();
-  };
+  const simulateClick = useCallback(
+    (user: boolean, time: number = 1000) => {
+      const [x, y] = getRandomIds(user ? enemyField : myField)
+        .split("-")
+        .map(Number);
+      const cell = document.querySelectorAll(`div[id='${x}-${y}']`)[
+        user ? 1 : 0
+      ];
+      const ref = makeEvent(cell, user, time);
+      if (ref) {
+        bot.botTimerRef.current = ref;
+        setBot((bot) => ({
+          ...bot,
+          endTimeForShoot: Date.now() + 1000,
+        }));
+      }
+    },
+    [bot.botTimerRef, enemyField, myField]
+  );
 
   const handleResetField = () => {
     setIsStarted(false);
     setPaused(false);
     clearIntervals();
-    initFields()
-    setCountToLose(3)
-    setCountToWin(3)
+    initFields();
+    setCountToLose(3);
+    setCountToWin(3);
   };
 
-  const handleTimeExpired = () => {
-    simulateClick(true);
-  };
-
-  const reset = () => {
+  const reset = useCallback(() => {
     clearInterval(timerRef.current);
     startTimer(TIMEFORSTEP, () => {
-      handleTimeExpired();
+      simulateClick(true);
+      reset();
     });
-  };
+  }, [simulateClick]);
 
   const pauseGame = () => {
     if (isStarted) {
@@ -127,29 +129,31 @@ function App() {
       clearIntervals();
     }
   };
+
   const continueGame = () => {
     setPaused(false);
     if (disabled) {
       simulateClick(false, bot.restTime);
     } else {
       startTimer(timeLeft, () => {
-        handleTimeExpired();
+        simulateClick(true);
+        reset();
       });
     }
   };
 
-  const clearIntervals = () => {
+  const clearIntervals = useCallback(() => {
     clearInterval(timerRef.current);
-    clearInterval(bot.botTimerRef);
-  };
+    clearInterval(bot.botTimerRef.current);
+  }, [bot.botTimerRef]);
 
-  const stopGame = () => {
+  const stopGame = useCallback(() => {
     setIsStarted(false);
     setPaused(false);
-    setDisabled(true)
+    setDisabled(true);
     clearIntervals();
-    initFields()
-  };
+    initFields();
+  }, [clearIntervals]);
 
   return (
     <div className={styles.root}>

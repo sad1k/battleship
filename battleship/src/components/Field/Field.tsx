@@ -22,7 +22,7 @@ export const Field = ({
   setField,
 }: IProps) => {
   const handleClick = (e: SyntheticEvent<HTMLDivElement, MouseEvent>) => {
-    if (isMyStep && isEnemyField || e.metaKey) {
+    if ((isMyStep && isEnemyField) || e.metaKey) {
       const [x, y] = e.target.id.split("-") as string[];
       makeShoot(+x, +y, isEnemyField);
       setField(structuredClone(field));
@@ -35,10 +35,11 @@ export const Field = ({
     >
       {field.map((row, index1) => {
         return (
-          <div className={styles.battleshipRow}>
+          <div key={`${index1}` + (isEnemyField ? " enemy row": " my row")} className={styles.battleshipRow}>
             {row.map((field, index2) => {
               return (
                 <Cell
+                  key={`${index2}-${index1}` + (isEnemyField ? " enemy": " my field")}
                   x={index2}
                   y={index1}
                   status={field}

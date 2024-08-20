@@ -4,7 +4,7 @@ import styles from "../../Battleship.module.css";
 import { Field } from "../Field/Field";
 import { makeEvent } from "../../utils/makeEvent";
 import { changeBoardAfterShoot } from "../../utils/changeBoardAfterShoot";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Modal } from "../Modal/Modal";
 
 export const ISBOT = "isbot";
@@ -18,14 +18,14 @@ interface GameProps {
   isStarted: boolean;
   countToWin: number;
   countToLose: number;
-  setCountToWin:React.Dispatch<React.SetStateAction<number>>;
+  setCountToWin: React.Dispatch<React.SetStateAction<number>>;
   setCountToLose: React.Dispatch<React.SetStateAction<number>>;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   reset: () => void;
-  stopGame: () => void
+  stopGame: () => void;
 }
 
-export function Game({
+export const Game = memo(function ({
   getField,
   setField,
   disabled,
@@ -35,12 +35,11 @@ export function Game({
   countToLose,
   setCountToWin,
   setCountToLose,
-  stopGame
+  stopGame,
 }: GameProps) {
   const myField = getField(true);
   const enemyField = getField(false);
   const [open, setOpen] = useState(false);
-
 
   const shoot = (x: number, y: number, isEnemyField: boolean) => {
     if (!disabled && isEnemyField) {
@@ -56,16 +55,15 @@ export function Game({
     if (!isHit) {
       setDisabled(false);
     } else {
-      if(countToLose === 1){
-        setOpen(true)
-        stopGame()
-      }else{
+      if (countToLose === 1) {
+        setOpen(true);
+        stopGame();
+      } else {
         simulateClick(false);
       }
-      setCountToLose(c => c - 1)
+      setCountToLose((c) => c - 1);
     }
   };
-
 
   const simulateClick = (user: boolean) => {
     const [x, y] = getRandomIds(user ? enemyField : myField)
@@ -80,13 +78,13 @@ export function Game({
     const isHit = enemyField[y][x] === CellStatus.Ship;
     changeBoardAfterShoot(enemyField, x, y, isHit);
     if (isHit) {
-      if(countToWin === 1){
-        setOpen(true)
-        stopGame()
-      }else{
+      if (countToWin === 1) {
+        setOpen(true);
+        stopGame();
+      } else {
         setDisabled(false);
       }
-      setCountToWin(c => c - 1)
+      setCountToWin((c) => c - 1);
     } else {
       setDisabled(true);
       simulateClick(false);
@@ -102,20 +100,23 @@ export function Game({
         isEnemyField={false}
         setField={setField(true)}
       />
-        <Field
-          field={enemyField}
-          isMyStep={!disabled}
-          makeShoot={shoot}
-          isEnemyField
-          setField={setField(false)}
-        />
-      <Modal open={open} onClose={() => {
-        const isUserWin = (countToWin === 0)
-        setField(!isUserWin)(() => createField())
-        setCountToLose(3)
-        setCountToWin(3)
-        setOpen(false)
-      }}>
+      <Field
+        field={enemyField}
+        isMyStep={!disabled}
+        makeShoot={shoot}
+        isEnemyField
+        setField={setField(false)}
+      />
+      <Modal
+        open={open}
+        onClose={() => {
+          const isUserWin = countToWin === 0;
+          setField(!isUserWin)(() => createField());
+          setCountToLose(3);
+          setCountToWin(3);
+          setOpen(false);
+        }}
+      >
         {countToWin == 0
           ? "Ура вы победили!"
           : countToLose == 0
@@ -124,4 +125,4 @@ export function Game({
       </Modal>
     </div>
   );
-}
+})
