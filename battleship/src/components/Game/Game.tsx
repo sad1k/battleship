@@ -6,6 +6,7 @@ import { makeEvent } from "../../utils/makeEvent";
 import { changeBoardAfterShoot } from "../../utils/changeBoardAfterShoot";
 import { memo, useState } from "react";
 import { Modal } from "../Modal/Modal";
+import { isClickedField } from "../../utils/isClickedField";
 
 export const ISBOT = "isbot";
 
@@ -15,27 +16,27 @@ interface GameProps {
     user: boolean
   ) => React.Dispatch<React.SetStateAction<CellStatus[][]>>;
   disabled: boolean;
+  reset: () => void;
   isStarted: boolean;
   countToWin: number;
   countToLose: number;
+  stopGame: () => void;
+  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   setCountToWin: React.Dispatch<React.SetStateAction<number>>;
   setCountToLose: React.Dispatch<React.SetStateAction<number>>;
-  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  reset: () => void;
-  stopGame: () => void;
 }
 
 export const Game = memo(function ({
+  reset,
   getField,
   setField,
   disabled,
-  setDisabled,
-  reset,
+  stopGame,
   countToWin,
   countToLose,
+  setDisabled,
   setCountToWin,
   setCountToLose,
-  stopGame,
 }: GameProps) {
   const myField = getField(true);
   const enemyField = getField(false);
@@ -50,6 +51,9 @@ export const Game = memo(function ({
   };
 
   const shootMe = (x: number, y: number) => {
+    if (isClickedField(myField, x, y)) {
+      return;
+    }
     const isHit = myField[y][x] === CellStatus.Ship;
     changeBoardAfterShoot(myField, x, y, isHit);
     if (!isHit) {
@@ -75,6 +79,9 @@ export const Game = memo(function ({
   };
 
   const userShoot = (x: number, y: number) => {
+    if (isClickedField(enemyField, x, y)) {
+      return;
+    }
     const isHit = enemyField[y][x] === CellStatus.Ship;
     changeBoardAfterShoot(enemyField, x, y, isHit);
     if (isHit) {
@@ -125,4 +132,4 @@ export const Game = memo(function ({
       </Modal>
     </div>
   );
-})
+});

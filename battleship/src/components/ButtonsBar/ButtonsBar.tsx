@@ -1,4 +1,5 @@
 import { Button } from "../Button/Button";
+import styles from "./Buttons.module.css";
 
 interface ButtonProps {
   startGame: () => void;
@@ -7,7 +8,7 @@ interface ButtonProps {
   continueGame: () => void;
   paused: boolean;
   setPaused: React.Dispatch<React.SetStateAction<boolean>>;
-  isStarted: boolean
+  isStarted: boolean;
 }
 
 export const ButtonsBar = ({
@@ -19,9 +20,8 @@ export const ButtonsBar = ({
   isStarted,
   pauseGame,
 }: ButtonProps) => {
-
   return (
-    <div className="buttonsPanel">
+    <div className={styles.buttonsPanel}>
       <Button
         onClick={() => {
           startGame();
@@ -33,7 +33,7 @@ export const ButtonsBar = ({
       {paused ? (
         <Button
           onClick={() => {
-            setPaused(false)
+            setPaused(false);
             continueGame();
           }}
         >
