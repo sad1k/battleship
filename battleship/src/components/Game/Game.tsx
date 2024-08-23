@@ -1,8 +1,7 @@
 import { CellStatus } from "../Cell";
-import { createField, getRandomIds } from "../../utils/createField";
+import { createField } from "../../utils/createField";
 import styles from "../../Battleship.module.css";
 import { Field } from "../Field/Field";
-import { makeEvent } from "../../utils/makeEvent";
 import { changeBoardAfterShoot } from "../../utils/changeBoardAfterShoot";
 import { memo, useState } from "react";
 import { Modal } from "../Modal/Modal";
@@ -16,7 +15,6 @@ interface GameProps {
     user: boolean
   ) => React.Dispatch<React.SetStateAction<CellStatus[][]>>;
   disabled: boolean;
-  reset: () => void;
   isStarted: boolean;
   countToWin: number;
   countToLose: number;
@@ -24,10 +22,10 @@ interface GameProps {
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   setCountToWin: React.Dispatch<React.SetStateAction<number>>;
   setCountToLose: React.Dispatch<React.SetStateAction<number>>;
+  simulateClick: (user: boolean, time: number) => void;
 }
 
 export const Game = memo(function ({
-  reset,
   getField,
   setField,
   disabled,
@@ -37,6 +35,7 @@ export const Game = memo(function ({
   setDisabled,
   setCountToWin,
   setCountToLose,
+  simulateClick,
 }: GameProps) {
   const myField = getField(true);
   const enemyField = getField(false);
@@ -63,19 +62,10 @@ export const Game = memo(function ({
         setOpen(true);
         stopGame();
       } else {
-        simulateClick(false);
+        simulateClick(false, 1000);
       }
       setCountToLose((c) => c - 1);
     }
-  };
-
-  const simulateClick = (user: boolean) => {
-    const [x, y] = getRandomIds(user ? enemyField : myField)
-      .split("-")
-      .map(Number);
-    const cell = document.querySelectorAll(`div[id='${x}-${y}']`)[user ? 1 : 0];
-    makeEvent(cell, user);
-    reset();
   };
 
   const userShoot = (x: number, y: number) => {
@@ -94,7 +84,7 @@ export const Game = memo(function ({
       setCountToWin((c) => c - 1);
     } else {
       setDisabled(true);
-      simulateClick(false);
+      simulateClick(false, 1000);
     }
   };
 

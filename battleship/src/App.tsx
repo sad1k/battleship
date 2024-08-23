@@ -21,7 +21,7 @@ function App() {
   const [countToWin, setCountToWin] = useState(3);
   const [countToLose, setCountToLose] = useState(3);
   const [bot, setBot] = useState({
-    botTimerRef: useRef(-1),
+    botTimerId: -1,
     endTimeForShoot: -1,
     restTime: -1,
   });
@@ -32,7 +32,7 @@ function App() {
     } else {
       return setEnemyField;
     }
-  }, [])
+  }, []);
 
   const initFields = () => {
     setMyField(() => createField());
@@ -49,13 +49,16 @@ function App() {
     setIsStarted(true);
   };
 
-  const getField = useCallback((user: boolean) => {
-    if (user) {
-      return myField;
-    } else {
-      return enemyField;
-    }
-  }, [enemyField, myField])
+  const getField = useCallback(
+    (user: boolean) => {
+      if (user) {
+        return myField;
+      } else {
+        return enemyField;
+      }
+    },
+    [enemyField, myField]
+  );
 
   useEffect(() => {
     if (isStarted) {
@@ -90,20 +93,20 @@ function App() {
       ];
       const ref = makeEvent(cell, user, time);
       if (ref) {
-        bot.botTimerRef.current = ref;
+        bot.botTimerId = ref;
         setBot((bot) => ({
           ...bot,
           endTimeForShoot: Date.now() + 1000,
         }));
       }
     },
-    [bot.botTimerRef, enemyField, myField]
+    [bot, enemyField, myField]
   );
-  
+
   const clearIntervals = useCallback(() => {
     clearInterval(timerRef.current);
-    clearInterval(bot.botTimerRef.current);
-  }, [bot.botTimerRef]);
+    clearInterval(bot.botTimerId);
+  }, [bot.botTimerId]);
 
   const handleResetField = useCallback(() => {
     setIsStarted(false);
@@ -112,7 +115,7 @@ function App() {
     initFields();
     setCountToLose(3);
     setCountToWin(3);
-  }, [clearIntervals])
+  }, [clearIntervals]);
 
   const reset = useCallback(() => {
     clearInterval(timerRef.current);
@@ -128,7 +131,7 @@ function App() {
       if (bot.endTimeForShoot != -1) {
         setBot((bot) => ({
           ...bot,
-          restTime: Date.now() - bot.endTimeForShoot,
+          restTime: timeLeft % 1000,
         }));
       }
       clearIntervals();
@@ -138,6 +141,7 @@ function App() {
   const continueGame = () => {
     setPaused(false);
     if (disabled) {
+      console.log(bot.restTime);
       simulateClick(false, bot.restTime);
     } else {
       startTimer(timeLeft, () => {
@@ -146,7 +150,6 @@ function App() {
       });
     }
   };
-
 
   const stopGame = useCallback(() => {
     setIsStarted(false);
@@ -175,13 +178,13 @@ function App() {
             <Game
               isStarted={paused}
               setField={setField}
+              simulateClick={simulateClick}
               getField={getField}
               disabled={disabled}
               setCountToWin={setCountToWin}
               setCountToLose={setCountToLose}
               countToLose={countToLose}
               countToWin={countToWin}
-              reset={reset}
               setDisabled={setDisabled}
               stopGame={stopGame}
             />
